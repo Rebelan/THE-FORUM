@@ -84,7 +84,7 @@ Toda la documentación del proyecto se encuentra en la carpeta `/docs`:
 ### 1. Clonar el repositorio
 
 bash
-git clone https://github.com/usuario/the-forum.git
+git clone https://github.com/Rebelan/THE-FORUM
 cd the-forum
 
 ### 2. Instalar dependencias
