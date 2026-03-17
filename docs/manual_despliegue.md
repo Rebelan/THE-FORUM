@@ -25,13 +25,13 @@ Clonar el proyecto desde GitHub:
 
 bash
 git clone https://github.com/Rebelan/THE-FORUM
-id="k28dms"
+id="id del git"
 
 Acceder a la carpeta del proyecto:
 
 bash
 cd the-forum
-id="s82kdl"
+id="id del git"
 
 ---
 
@@ -41,7 +41,7 @@ Instalar las dependencias del proyecto:
 
 bash
 npm install
-id="d82kdl"
+id="id del proyecto"
 
 ---
 
@@ -52,7 +52,7 @@ Crear un archivo .env en la raíz del proyecto con las siguientes variables:
 env
 VITE_SUPABASE_URL=tu_url_de_supabase
 VITE_SUPABASE_ANON_KEY=tu_clave_publica
-id="p39dks"
+id="id correspondiente"
 
 Estas credenciales se obtienen desde el panel de Supabase.
 
@@ -64,7 +64,7 @@ Iniciar la aplicación:
 
 bash
 npm run dev
-id="f82kdl"
+id="id correspondiente"
 
 Por defecto, la aplicación estará disponible en:
 
@@ -79,7 +79,7 @@ Para generar la versión optimizada:
 
 bash
 npm run build
-id="z92kdl"
+id="id correspondiente"
 
 Los archivos generados se encontrarán en la carpeta: /dist
 
