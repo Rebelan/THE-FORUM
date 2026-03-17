@@ -24,7 +24,7 @@ Antes de ejecutar la aplicación, es necesario disponer de:
 Clonar el proyecto desde GitHub:
 
 bash
-git clone https://github.com/usuario/the-forum.git
+git clone https://github.com/Rebelan/THE-FORUM
 id="k28dms"
 
 Acceder a la carpeta del proyecto:
