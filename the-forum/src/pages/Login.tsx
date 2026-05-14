@@ -32,7 +32,7 @@ export default function Login() {
       setLoading(false)
     } else {
       // Si entra correctamente, lo mandamos al Home
-      navigate('/')
+      navigate('/app')
     }
   }
 
