@@ -154,7 +154,7 @@ export default function JuegoForos() {
                                 <Card
                                     key={foro.id}
                                     className="hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
-                                    onClick={() => console.log(`Ir al foro: ${foro.id}`)} // De momento solo imprime
+                                    onClick={() => navigate(`/app/foro/${foro.id}`)} // De momento solo imprime
                                 >
                                     <CardHeader>
                                         <div className="flex justify-between items-start gap-4">

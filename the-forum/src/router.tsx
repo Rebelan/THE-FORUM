@@ -6,6 +6,7 @@ import { AuthGuard } from '@/components/auth/authGuard'
 import Main from '@/pages/Main'
 import Foros from './pages/Foros'
 import JuegoForos from './pages/JuegoForos'
+import ForoDetalle from './pages/ForoDetalle'
 
 export const router = createBrowserRouter([
   // RUTAS PÚBLICAS
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
           {
             path: 'foros/juego/:id',
             element: <JuegoForos />, 
+          },
+          {
+            path: 'foro/:foroId',
+            element: <ForoDetalle />, 
           },
         ]
       }

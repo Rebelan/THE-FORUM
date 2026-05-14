@@ -5,8 +5,13 @@ import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/ca
 import type { Categoria } from '@/types'
 import { CrearForoModal } from '@/components/foros/CrearForoModal' // Importamos nuestro nuevo componente
 import { MessageSquare } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
 
 export default function Main() {
+
+    const navigate = useNavigate()
+
     const user = useAuthStore((state) => state.user)
 
     const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -62,7 +67,11 @@ export default function Main() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {forosRecientes.map((foro) => (
-                            <Card key={foro.id} className="hover:shadow-lg transition-shadow cursor-pointer overflow-hidden flex flex-col">
+                            <Card 
+                            key={foro.id} 
+                            className="hover:shadow-lg transition-shadow cursor-pointer overflow-hidden flex flex-col"
+                            onClick={() =>navigate(`/app/foro/${foro.id}`)}
+                            >
                                 <div className="h-16 bg-linear-to-r from-blue-600 to-indigo-700"></div>
                                 <CardHeader className="-mt-10 relative pb-2">
                                     <div className="absolute top-0 right-4 bg-white px-3 py-1 rounded-full text-xs font-bold text-blue-700 shadow-sm border border-gray-100">
