@@ -35,5 +35,15 @@ export const rawgApi = {
       console.error(error);
       return [];
     }
+  },
+  getJuegoDetalle: async (id: string) => {
+    try {
+      const res = await fetch(`${BASE_URL}/games/${id}?key=${RAWG_API_KEY}`);
+      if (!res.ok) throw new Error('Error al obtener detalle del juego');
+      return await res.json();
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   }
 };
