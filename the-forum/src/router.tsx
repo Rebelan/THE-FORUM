@@ -2,8 +2,8 @@ import { createBrowserRouter } from 'react-router-dom'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
 import MainLayout from '@/layouts/MainLayout'
+import { AuthGuard } from '@/components/auth/authGuard'
 import Main from '@/pages/Main'
-import { AuthGuard } from './components/auth/authGuard'
 
 export const router = createBrowserRouter([
   // RUTAS PÚBLICAS
