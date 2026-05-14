@@ -4,6 +4,7 @@ import Login from '@/pages/Login'
 import MainLayout from '@/layouts/MainLayout'
 import { AuthGuard } from '@/components/auth/authGuard'
 import Main from '@/pages/Main'
+import Foros from './pages/Foros'
 
 export const router = createBrowserRouter([
   // RUTAS PÚBLICAS
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
           {
             path: '',
             element: <Main />, 
+          },
+          {
+            path: 'foros',
+            element: <Foros />,
           },
         ]
       }
