@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { rawgApi, type JuegoBuscador } from '@/lib/rawg'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Search, Gamepad2 } from 'lucide-react'
 
 export default function Foros() {
@@ -11,7 +11,7 @@ export default function Foros() {
   const [cargando, setCargando] = useState(true)
   const [busqueda, setBusqueda] = useState('')
 
-  // 1. Cargar juegos populares al entrar a la página
+
   useEffect(() => {
     async function cargarPopulares() {
       setCargando(true)
@@ -22,13 +22,13 @@ export default function Foros() {
     cargarPopulares()
   }, [])
 
-  // 2. Buscador en vivo (Debounce)
+
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (busqueda.length >= 3) {
         setCargando(true)
         const resultados = await rawgApi.buscarJuegos(busqueda)
-        // Sobrescribimos la lista de populares con los resultados de búsqueda
+
         setJuegos(resultados)
         setCargando(false)
       } else if (busqueda.length === 0) {

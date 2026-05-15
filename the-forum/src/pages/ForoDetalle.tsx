@@ -119,7 +119,7 @@ export default function ForoDetalle() {
         {/* POST INICIAL (Destacado) */}
         {postInicial ? (
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-            {/* Cabecera del autor (De momento anónimo hasta que hagamos perfiles) */}
+            {/* Cabecera del autor*/}
             <div className="bg-slate-50 border-b border-gray-100 p-4 flex justify-between items-center text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">OP</div>
@@ -177,7 +177,7 @@ export default function ForoDetalle() {
                 {/* Columna Derecha: Contenido */}
                 <div className="p-4 flex-1 flex flex-col">
 
-                  {/* Cajita de Cita (Si aplica) */}
+                  {/* Cajita de Cita */}
                   {postCitadoObj && (
                     <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4 rounded-r-md text-sm text-gray-700 relative">
                       <Quote className="w-4 h-4 text-blue-300 absolute top-2 right-2" />
@@ -205,7 +205,7 @@ export default function ForoDetalle() {
           })}
         </div>
 
-        {/* CAJA DE RESPUESTA (Editor inferior) */}
+        {/* CAJA DE RESPUESTA */}
         <div className="mt-8 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="caja-respuesta">
           <div className="bg-slate-900 text-white px-4 py-3 font-semibold text-sm">
             Añadir una respuesta

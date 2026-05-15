@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/lib/supabase'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import type { Categoria } from '@/types'
-import { CrearForoModal } from '@/components/foros/CrearForoModal' // Importamos nuestro nuevo componente
+import { CrearForoModal } from '@/components/foros/CrearForoModal'
 import { MessageSquare } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
@@ -51,7 +51,7 @@ export default function Main() {
                     <p className="text-gray-500 mt-2">Bienvenido de nuevo, <span className="font-medium text-blue-600">{user?.email}</span></p>
                 </div>
 
-                {/* AQUÍ ESTÁ NUESTRO COMPONENTE REUTILIZABLE */}
+               
                 <CrearForoModal onCreado={cargarDatosDashboard} />
             </div>
 

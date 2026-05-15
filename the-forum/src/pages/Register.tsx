@@ -23,24 +23,23 @@ export default function Register() {
     setCargando(true)
 
     try {
-      // Llamada a Supabase para registrar al usuario
+      
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            username: username, // ¡CLAVE! Esto lo lee nuestro Trigger de SQL para crear el perfil
+            username: username, 
           },
         },
       })
 
       if (signUpError) throw signUpError
 
-      // Si todo va bien, mostramos el mensaje de éxito
+
       setExito(true)
       
-      // Si Supabase autologuea al usuario (depende de si tienes la confirmación de email quitada),
-      // lo mandamos a la app después de 2 segundos.
+
       if (data.session) {
         setTimeout(() => navigate('/app'), 2000)
       }
