@@ -69,7 +69,7 @@ export function Sidebar() {
           onClick={handleLogout}
         >
           <LogOut className={`h-5 w-5 ${!isCollapsed && "mr-3"}`} />
-          {!isCollapsed && <span>Salir</span>}
+          {!isCollapsed && <span>Cerrar sesión</span>}
         </Button>
       </div>
     </aside>

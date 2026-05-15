@@ -7,6 +7,7 @@ import Main from '@/pages/Main'
 import Foros from './pages/Foros'
 import JuegoForos from './pages/JuegoForos'
 import ForoDetalle from './pages/ForoDetalle'
+import Register from './pages/Register'
 
 export const router = createBrowserRouter([
   // RUTAS PÚBLICAS
@@ -17,6 +18,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/register',
+    element: <Register />
   },
   
   // RUTAS PRIVADAS (Protegidas)
