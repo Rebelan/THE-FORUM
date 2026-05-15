@@ -125,7 +125,8 @@ export default function ForoDetalle() {
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">OP</div>
                 <div>
                   <span className="font-bold text-gray-900">Creador del Tema: </span>
-                  {postInicial.usuarios?.username || 'Cargando nombre...'}                </div>
+                  {postInicial.usuarios?.username || 'Anónimo'}
+                </div>
               </div>
               <span className="text-gray-500">{new Date(postInicial.created_at).toLocaleDateString()} a las {new Date(postInicial.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
