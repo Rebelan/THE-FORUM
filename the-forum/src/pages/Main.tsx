@@ -15,7 +15,7 @@ export default function Main() {
     const [cargando, setCargando] = useState(true)
     const [forosRecientes, setForosRecientes] = useState<any[]>([])
     const [juegosRecientes, setJuegosRecientes] = useState<any[]>([])
-    const [username, setUsername] = useState<string>('') // NUEVO ESTADO PARA EL USERNAME
+    const [username, setUsername] = useState<string>('')
 
     const cargarDatosDashboard = async () => {
         try {
