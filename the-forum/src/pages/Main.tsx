@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/lib/supabase'
 import { rawgApi } from '@/lib/rawg'
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { CrearForoModal } from '@/components/foros/CrearForoModal'
 import { Gamepad2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -35,22 +34,29 @@ export default function Main() {
                 .limit(15)
 
             if (dataForos) {
-                setForosRecientes(dataForos.slice(0, 6))
-
                 const idsJuegosUnicos = Array.from(new Set(dataForos.map(f => f.videojuego_id).filter(Boolean)))
-                const topIdsJuegos = idsJuegosUnicos.slice(0, 4)
-
+                
                 const juegosConPortada = await Promise.all(
-                    topIdsJuegos.map(async (id) => {
+                    idsJuegosUnicos.slice(0, 10).map(async (id) => {
                         try {
-                            return await rawgApi.getJuegoDetalle(id.toString())
+                            return await rawgApi.getJuegoDetalle(id!.toString())
                         } catch (e) {
                             const foroRef = dataForos.find(f => f.videojuego_id === id)
                             return { id, name: foroRef?.videojuegos?.nombre || 'Desconocido', background_image: null }
                         }
                     })
                 )
-                setJuegosRecientes(juegosConPortada.filter(Boolean))
+
+                setJuegosRecientes(juegosConPortada.filter(j => j?.background_image).slice(0, 4))
+
+                const forosConImagen = dataForos.slice(0, 6).map(foro => {
+                    const juegoInfo = juegosConPortada.find(j => j.id === foro.videojuego_id)
+                    return {
+                        ...foro,
+                        imagen_juego: juegoInfo?.background_image || null 
+                    }
+                })
+                setForosRecientes(forosConImagen)
             }
 
         } catch (error) {
@@ -71,9 +77,8 @@ export default function Main() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-4xl font-bold text-gray-900">Panel Principal</h1>
-                    <p className="text-gray-500 mt-2">Bienvenido de nuevo, <span className="font-medium text-blue-600">{username || user?.email}</span></p>
+                    <p className="text-gray-500 mt-2">Bienvenido de nuevo, <span className="font-bold text-violet-600">{username || user?.email}</span></p>
                 </div>
-
 
                 <div className="flex items-center gap-4">
                     <CampanaNotificaciones /> 
@@ -82,7 +87,7 @@ export default function Main() {
                 </div>
             </div>
 
-            {/* JUEGOS CON ACTIVIDAD RECIENTE */}
+            {/* JUEGOS CON ACTIVIDAD RECIENTE (TENDENCIAS) */}
             <div className="space-y-4">
                 <h2 className="text-2xl font-semibold text-gray-800">Tendencias en la Comunidad</h2>
                 {cargando ? (
@@ -92,32 +97,31 @@ export default function Main() {
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         {juegosRecientes.map((juego) => (
-                            <Card 
+                            <div 
                                 key={juego.id} 
-                                className="group cursor-pointer overflow-hidden border-transparent shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                                className="group relative h-48 rounded-xl overflow-hidden cursor-pointer border-2 border-slate-800 hover:border-violet-500 hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all duration-300"
                                 onClick={() => navigate(`/app/foros/juego/${juego.id}`)}
                             >
-                                <div className="relative h-48 w-full overflow-hidden bg-gray-200">
-                                    {juego.background_image ? (
-                                        <img 
-                                            src={juego.background_image} 
-                                            alt={juego.name} 
-                                            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className="flex items-center justify-center h-full text-gray-400">
-                                            <Gamepad2 className="w-12 h-12 opacity-50" />
-                                        </div>
-                                    )}
-                                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
-                                    
-                                    <div className="absolute bottom-0 left-0 p-4 w-full">
-                                        <h3 className="text-white font-bold text-lg leading-tight line-clamp-2">
-                                            {juego.name}
-                                        </h3>
+                                {juego.background_image ? (
+                                    <img 
+                                        src={juego.background_image} 
+                                        alt={juego.name} 
+                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
+                                        <Gamepad2 className="w-12 h-12 text-slate-700" />
                                     </div>
+                                )}
+                                
+                                <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/50 to-transparent"></div>
+                                
+                                <div className="absolute bottom-0 left-0 p-4 w-full">
+                                    <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 drop-shadow-md">
+                                        {juego.name}
+                                    </h3>
                                 </div>
-                            </Card>
+                            </div>
                         ))}
                     </div>
                 )}
@@ -135,20 +139,38 @@ export default function Main() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {forosRecientes.map((foro) => (
-                            <Card 
-                            key={foro.id} 
-                            className="hover:shadow-lg transition-shadow cursor-pointer overflow-hidden flex flex-col"
-                            onClick={() =>navigate(`/app/foro/${foro.id}`)}
+                            <div 
+                                key={foro.id} 
+                                className="group relative h-40 rounded-xl overflow-hidden cursor-pointer border-2 border-slate-800 hover:border-violet-500 hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all duration-300 flex flex-col"
+                                onClick={() => navigate(`/app/foro/${foro.id}`)}
                             >
-                                <div className="h-16 bg-linear-to-r from-blue-600 to-indigo-700"></div>
-                                <CardHeader className="-mt-10 relative pb-2">
-                                    <div className="absolute top-0 right-4 bg-white px-3 py-1 rounded-full text-xs font-bold text-blue-700 shadow-sm border border-gray-100">
-                                        {foro.categorias?.nombre || 'General'}
+                                
+                                {foro.imagen_juego ? (
+                                    <img 
+                                        src={foro.imagen_juego} 
+                                        alt={foro.videojuegos?.nombre} 
+                                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
+                                        <Gamepad2 className="w-10 h-10 text-slate-700" />
                                     </div>
-                                    <CardTitle className="text-xl pt-4 line-clamp-1" title={foro.titulo}>{foro.titulo}</CardTitle>
-                                    <CardDescription className="font-medium text-gray-900 mt-1">🎮 {foro.videojuegos?.nombre || 'Juego Desconocido'}</CardDescription>
-                                </CardHeader>
-                            </Card>
+                                )}
+
+                                <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-900/70 to-slate-900/20"></div>
+
+                                <div className="absolute bottom-0 left-0 w-full p-4 flex flex-col justify-end">
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-violet-400 mb-1 block drop-shadow-md">
+                                        {foro.categorias?.nombre || 'General'}
+                                    </span>
+                                    <h3 className="text-slate-50 font-bold text-lg leading-tight line-clamp-1 drop-shadow-md" title={foro.titulo}>
+                                        {foro.titulo}
+                                    </h3>
+                                    <p className="text-slate-200 font-bold text-sm mt-1.5 drop-shadow-md flex items-center gap-1.5">
+                                        {foro.videojuegos?.nombre || 'Juego Desconocido'}
+                                    </p>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 )}

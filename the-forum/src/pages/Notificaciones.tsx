@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
-import { Bell, MessageSquare, Quote, CheckCheck, Trash2 } from 'lucide-react'
+import { Bell, MessageSquare, Quote, CheckCheck} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function Notificaciones() {
@@ -35,12 +35,6 @@ export default function Notificaciones() {
 
   const marcarTodoLeido = async () => {
     await supabase.from('notificaciones').update({ leida: true }).eq('usuario_id', user?.id)
-    cargarTodas()
-  }
-
-  const limpiarHistorial = async () => {
-    if (!window.confirm('¿Seguro que quieres borrar todas tus notificaciones?')) return
-    await supabase.from('notificaciones').delete().eq('usuario_id', user?.id)
     cargarTodas()
   }
 

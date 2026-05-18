@@ -180,7 +180,7 @@ export default function Perfil() {
                 value={biografiaEdit}
                 onChange={(e) => setBiografiaEdit(e.target.value)}
                 placeholder="Cuéntale a la comunidad qué te gusta jugar..."
-                className="w-full flex-1 min-h-[200px] p-4 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+                className="w-full flex-1 min-h-50 p-4 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
                 maxLength={500}
               />
             ) : perfil.biografia ? (
