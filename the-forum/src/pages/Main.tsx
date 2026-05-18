@@ -6,12 +6,10 @@ import type { Categoria } from '@/types'
 import { CrearForoModal } from '@/components/foros/CrearForoModal'
 import { MessageSquare } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-
+import { CampanaNotificaciones } from '@/components/layout/CampanaNotificaciones' // AÑADIDO: Importamos la campana
 
 export default function Main() {
-
     const navigate = useNavigate()
-
     const user = useAuthStore((state) => state.user)
 
     const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -45,14 +43,18 @@ export default function Main() {
         <div className="p-8 max-w-6xl mx-auto space-y-10 animate-in fade-in duration-500">
 
             {/* CABECERA */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-4xl font-bold text-gray-900">Panel Principal</h1>
                     <p className="text-gray-500 mt-2">Bienvenido de nuevo, <span className="font-medium text-blue-600">{user?.email}</span></p>
                 </div>
 
-               
-                <CrearForoModal onCreado={cargarDatosDashboard} />
+                {/* ZONA DE ACCIONES (Notificaciones + Crear Foro) */}
+                <div className="flex items-center gap-4">
+                    <CampanaNotificaciones /> 
+                    <div className="h-8 w-px bg-gray-200 hidden sm:block"></div> {/* Separador visual */}
+                    <CrearForoModal onCreado={cargarDatosDashboard} />
+                </div>
             </div>
 
             {/* SECCIÓN: FOROS RECIENTES */}
