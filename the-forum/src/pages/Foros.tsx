@@ -45,7 +45,7 @@ export default function Foros() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
-      
+
       {/* CABECERA Y BUSCADOR */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -57,8 +57,8 @@ export default function Foros() {
 
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-          <Input 
-            placeholder="Buscar videojuego..." 
+          <Input
+            placeholder="Buscar videojuego..."
             className="pl-10 h-12 text-md shadow-sm"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
@@ -78,16 +78,16 @@ export default function Foros() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {juegos.map((juego) => (
-            <Card 
-              key={juego.id} 
+            <Card
+              key={juego.id}
               className="group cursor-pointer overflow-hidden border-transparent shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               onClick={() => navigate(`/app/foros/juego/${juego.id}`)}
             >
               <div className="relative h-48 w-full overflow-hidden bg-gray-200">
                 {juego.background_image ? (
-                  <img 
-                    src={juego.background_image} 
-                    alt={juego.name} 
+                  <img
+                    src={juego.background_image}
+                    alt={juego.name}
                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                   />
                 ) : (
@@ -97,7 +97,7 @@ export default function Foros() {
                 )}
                 {/* Degradado negro en la parte inferior para que se lea el texto */}
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"></div>
-                
+
                 <div className="absolute bottom-0 left-0 p-4 w-full">
                   <h3 className="text-white font-bold text-lg leading-tight line-clamp-2">
                     {juego.name}
