@@ -12,13 +12,13 @@ export default function ForoDetalle() {
 
   const [foro, setForo] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
-  
+
   // Estados para crear el nuevo post
   const [nuevoPost, setNuevoPost] = useState('')
   const [postCitado, setPostCitado] = useState<any | null>(null)
   const [cargando, setCargando] = useState(true)
   const [enviando, setEnviando] = useState(false)
-  
+
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const cargarDatos = async () => {
@@ -33,9 +33,9 @@ export default function ForoDetalle() {
 
       const { data: dataPosts } = await supabase
         .from('posts')
-        .select('*')
+        .select('*, usuarios(*)')
         .eq('foro_id', foroId)
-        .order('created_at', { ascending: true }) 
+        .order('created_at', { ascending: true })
       if (dataPosts) setPosts(dataPosts)
 
     } catch (error) {
@@ -68,7 +68,7 @@ export default function ForoDetalle() {
       setNuevoPost('')
       setPostCitado(null)
       await cargarDatos()
-      
+
       // Hacemos scroll abajo suavemente
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
 
@@ -97,7 +97,7 @@ export default function ForoDetalle() {
 
   return (
     <div className="min-h-screen bg-gray-100 pb-12">
-      
+
       {/* CABECERA DEL FORO */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-5xl mx-auto p-4 md:p-6 flex items-start md:items-center gap-4">
@@ -115,29 +115,29 @@ export default function ForoDetalle() {
       </div>
 
       <div className="max-w-5xl mx-auto p-4 space-y-6 mt-4">
-        
+
         {/* POST INICIAL (Destacado) */}
         {postInicial ? (
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-            {/* Cabecera del autor (De momento anónimo hasta que hagamos perfiles) */}
+            {/* Cabecera del autor*/}
             <div className="bg-slate-50 border-b border-gray-100 p-4 flex justify-between items-center text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xs">OP</div>
                 <div>
-                  <span className="font-bold text-gray-900">Creador del Tema</span>
-                  {postInicial.autor_id === user?.id && <span className="ml-2 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Tú</span>}
+                  <span className="font-bold text-gray-900">Creador del Tema: </span>
+                  {postInicial.usuarios?.username || 'Anónimo'}
                 </div>
               </div>
-              <span className="text-gray-500">{new Date(postInicial.created_at).toLocaleDateString()} a las {new Date(postInicial.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+              <span className="text-gray-500">{new Date(postInicial.created_at).toLocaleDateString()} a las {new Date(postInicial.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
-            
+
             {/* Contenido destacado */}
             <div className="p-6 md:p-8">
               <p className="whitespace-pre-wrap text-gray-800 text-lg md:text-xl leading-relaxed">
                 {postInicial.contenido}
               </p>
             </div>
-            
+
             {/* Botonera inferior */}
             <div className="bg-gray-50/50 p-3 flex justify-end">
               <Button variant="ghost" size="sm" className="text-gray-500 hover:text-blue-600" onClick={() => iniciarRespuesta(postInicial)}>
@@ -157,15 +157,17 @@ export default function ForoDetalle() {
           {respuestas.map((post, index) => {
             // Buscamos si este post cita a otro anterior
             const postCitadoObj = post.post_citado_id ? posts.find(p => p.id === post.post_citado_id) : null;
-            
+
             return (
               <div key={post.id} className="bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col md:flex-row">
-                
+
                 {/* Columna Izquierda: Info del Autor */}
                 <div className="bg-slate-50 border-b md:border-b-0 md:border-r border-gray-100 p-4 md:w-48 shrink-0 flex md:flex-col items-center md:items-start gap-3">
                   <div className="w-10 h-10 bg-gray-300 rounded flex items-center justify-center text-gray-600 font-bold">U</div>
                   <div className="flex-1">
-                    <div className="font-bold text-gray-900 text-sm">Usuario</div>
+                    <div className="font-bold text-gray-900 text-sm">
+                      {post.usuarios?.username || 'Anónimo'}
+                    </div>
                     <div className="text-xs text-gray-500 mt-1">
                       {new Date(post.created_at).toLocaleDateString()}
                     </div>
@@ -175,8 +177,8 @@ export default function ForoDetalle() {
 
                 {/* Columna Derecha: Contenido */}
                 <div className="p-4 flex-1 flex flex-col">
-                  
-                  {/* Cajita de Cita (Si aplica) */}
+
+                  {/* Cajita de Cita */}
                   {postCitadoObj && (
                     <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4 rounded-r-md text-sm text-gray-700 relative">
                       <Quote className="w-4 h-4 text-blue-300 absolute top-2 right-2" />
@@ -184,14 +186,14 @@ export default function ForoDetalle() {
                       <p className="italic line-clamp-3">{postCitadoObj.contenido}</p>
                     </div>
                   )}
-                  
+
                   {/* El texto del post */}
                   <div className="flex-1">
                     <p className="whitespace-pre-wrap text-gray-800 leading-relaxed text-[15px]">
                       {post.contenido}
                     </p>
                   </div>
-                  
+
                   {/* Botonera de la respuesta */}
                   <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
                     <Button variant="ghost" size="sm" className="text-gray-500 hover:text-blue-600 h-8 text-xs" onClick={() => iniciarRespuesta(post)}>
@@ -204,14 +206,14 @@ export default function ForoDetalle() {
           })}
         </div>
 
-        {/* CAJA DE RESPUESTA (Editor inferior) */}
+        {/* CAJA DE RESPUESTA */}
         <div className="mt-8 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="caja-respuesta">
           <div className="bg-slate-900 text-white px-4 py-3 font-semibold text-sm">
             Añadir una respuesta
           </div>
-          
+
           <form onSubmit={handleEnviarPost} className="p-4">
-            
+
             {/* Aviso visual si estás citando a alguien */}
             {postCitado && (
               <div className="bg-blue-50 border border-blue-200 p-3 mb-4 rounded-md flex justify-between items-start gap-4">
@@ -236,7 +238,7 @@ export default function ForoDetalle() {
               disabled={enviando}
               required
             />
-            
+
             <div className="flex justify-end">
               <Button type="submit" disabled={!nuevoPost.trim() || enviando} className="bg-blue-600 hover:bg-blue-700 px-8">
                 {enviando ? 'Publicando...' : (posts.length === 0 ? 'Publicar Tema' : 'Responder')}

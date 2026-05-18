@@ -1,15 +1,31 @@
-// src/components/layout/Sidebar.tsx
-import { useState } from 'react'
+import { useState, useEffect } from 'react' 
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { supabase } from '@/lib/supabase' 
 import { Menu, MessageSquare, Users, Settings, LogOut, Home as HomeIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [rolUsuario, setRolUsuario] = useState<number | null>(null) 
+
+  const user = useAuthStore((state) => state.user) 
   const logout = useAuthStore((state) => state.logout)
   const navigate = useNavigate()
   const location = useLocation()
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('usuarios')
+        .select('rol_id')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) setRolUsuario(data.rol_id)
+        })
+    }
+  }, [user])
 
   const handleLogout = async () => {
     await logout()
@@ -19,7 +35,7 @@ export function Sidebar() {
   const menuItems = [
     { name: 'Inicio', icon: HomeIcon, path: '/app' },
     { name: 'Foros', icon: MessageSquare, path: '/app/foros' },
-    { name: 'Usuarios', icon: Users, path: '/app/usuarios' },
+    ...(rolUsuario === 1 ? [{ name: 'Usuarios', icon: Users, path: '/app/usuarios' }] : []),
   ]
 
   return (
@@ -69,7 +85,7 @@ export function Sidebar() {
           onClick={handleLogout}
         >
           <LogOut className={`h-5 w-5 ${!isCollapsed && "mr-3"}`} />
-          {!isCollapsed && <span>Salir</span>}
+          {!isCollapsed && <span>Cerrar sesión</span>}
         </Button>
       </div>
     </aside>
