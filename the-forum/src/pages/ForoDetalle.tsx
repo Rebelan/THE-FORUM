@@ -12,7 +12,7 @@ export default function ForoDetalle() {
 
   const [foro, setForo] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
-  const [rolUsuario, setRolUsuario] = useState<number>(3) // Estado para saber si es Admin/Mod
+  const [rolUsuario, setRolUsuario] = useState<number>(3)
 
   // Estados para crear el nuevo post
   const [nuevoPost, setNuevoPost] = useState('')
@@ -25,12 +25,10 @@ export default function ForoDetalle() {
   const cargarDatos = async () => {
     if (!foroId) return
     try {
-
       if (user) {
         const { data: perfil } = await supabase.from('usuarios').select('rol_id').eq('id', user.id).single()
         if (perfil) setRolUsuario(perfil.rol_id)
       }
-
 
       const { data: dataForo } = await supabase
         .from('foros')
@@ -38,7 +36,6 @@ export default function ForoDetalle() {
         .eq('id', foroId)
         .single()
       if (dataForo) setForo(dataForo)
-
 
       const { data: dataPosts } = await supabase
         .from('posts')
@@ -58,7 +55,6 @@ export default function ForoDetalle() {
     cargarDatos()
   }, [foroId, user])
 
- 
   const toggleCerrarForo = async () => {
     if (!window.confirm(`¿Seguro que quieres ${foro.cerrado ? 'reabrir' : 'cerrar'} este foro?`)) return
     try {
@@ -99,7 +95,7 @@ export default function ForoDetalle() {
   }
 
   const iniciarRespuesta = (postTarget: any) => {
-    if (foro.cerrado) return 
+    if (foro.cerrado) return
     setPostCitado(postTarget)
     if (textareaRef.current) {
       textareaRef.current.focus()
@@ -117,7 +113,7 @@ export default function ForoDetalle() {
     <div className="min-h-screen bg-gray-100 pb-12">
 
       {/* CABECERA DEL FORO */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
         <div className="max-w-5xl mx-auto p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4">
           <div className="flex items-start md:items-center gap-4 flex-1">
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="mt-1 md:mt-0 shrink-0 text-gray-500 hover:text-gray-900">
@@ -126,7 +122,6 @@ export default function ForoDetalle() {
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-xl md:text-3xl font-extrabold text-gray-900 leading-tight">{foro.titulo}</h1>
-                {/* ETIQUETA VISUAL CERRADO */}
                 {foro.cerrado && (
                   <span className="bg-red-100 text-red-700 px-2.5 py-0.5 rounded-md text-xs font-bold flex items-center gap-1 border border-red-200">
                     <Lock className="w-3.5 h-3.5" /> CERRADO
@@ -141,18 +136,14 @@ export default function ForoDetalle() {
           </div>
           
           {(rolUsuario === 1 || rolUsuario === 2) && (
-            <Button 
-              variant={foro.cerrado ? "outline" : "destructive"} 
-              onClick={toggleCerrarForo}
-              className="w-full md:w-auto shrink-0"
-            >
+            <Button variant={foro.cerrado ? "outline" : "destructive"} onClick={toggleCerrarForo} className="w-full md:w-auto shrink-0">
               {foro.cerrado ? <><Unlock className="w-4 h-4 mr-2" /> Reabrir Tema</> : <><Lock className="w-4 h-4 mr-2" /> Cerrar Tema</>}
             </Button>
           )}
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto p-4 space-y-6 mt-4">
+      <div className="max-w-5xl mx-auto p-4 space-y-6 mt-4 pb-44 relative">
 
         {/* POST INICIAL */}
         {postInicial ? (
@@ -238,30 +229,31 @@ export default function ForoDetalle() {
         </div>
 
         {foro.cerrado ? (
-          <div className="mt-8 bg-red-50 border border-red-200 rounded-xl p-8 flex flex-col items-center text-center text-red-800 shadow-sm">
-            <AlertTriangle className="w-12 h-12 mb-3 opacity-80 text-red-500" />
-            <h3 className="font-bold text-xl mb-1">Este tema ha sido cerrado</h3>
-            <p className="text-sm opacity-90 max-w-lg mt-2">
-              El equipo de moderación ha cerrado este foro. Ya no se admiten nuevas respuestas, pero puedes seguir leyendo el historial de mensajes.
+          <div className="sticky bottom-4 z-20 mt-8 bg-red-50 border border-red-200 rounded-xl p-6 flex flex-col items-center text-center text-red-800 shadow-xl animate-in slide-in-from-bottom-4">
+            <AlertTriangle className="w-10 h-10 mb-2 opacity-80 text-red-500" />
+            <h3 className="font-bold text-lg">Este tema ha sido cerrado</h3>
+            <p className="text-sm opacity-90 max-w-lg mt-1">
+              No se admiten nuevas respuestas, pero puedes seguir leyendo el historial.
             </p>
           </div>
         ) : (
-          <div className="mt-8 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" id="caja-respuesta">
-            <div className="bg-slate-900 text-white px-4 py-3 font-semibold text-sm">
-              Añadir una respuesta
+          <div className="sticky bottom-4 z-20 mt-8 bg-white border border-gray-300 rounded-xl shadow-2xl overflow-hidden border-t-2 border-t-blue-500 animate-in slide-in-from-bottom-4" id="caja-respuesta">
+            <div className="bg-slate-900 text-white px-4 py-2.5 font-semibold text-xs uppercase tracking-wider flex justify-between items-center">
+              <span>Añadir una respuesta al debate</span>
+              {postCitado && <span className="text-[11px] bg-blue-600 px-2 py-0.5 rounded text-blue-100 animate-pulse">Modo Cita Activo</span>}
             </div>
 
-            <form onSubmit={handleEnviarPost} className="p-4">
+            <form onSubmit={handleEnviarPost} className="p-4 bg-white">
               {postCitado && (
-                <div className="bg-blue-50 border border-blue-200 p-3 mb-4 rounded-md flex justify-between items-start gap-4">
-                  <div>
-                    <div className="text-xs font-bold text-blue-800 mb-1 flex items-center">
-                      <Quote className="w-3 h-3 mr-1" /> Vas a citar este mensaje:
+                <div className="bg-blue-50 border border-blue-200 p-2.5 mb-3 rounded-md flex justify-between items-start gap-4">
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-bold text-blue-800 mb-0.5 flex items-center">
+                      <Quote className="w-3 h-3 mr-1" /> Cita seleccionada:
                     </div>
-                    <p className="text-sm text-gray-600 italic line-clamp-2">{postCitado.contenido}</p>
+                    <p className="text-xs text-gray-600 italic truncate">{postCitado.contenido}</p>
                   </div>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-500 hover:text-red-600 shrink-0" onClick={() => setPostCitado(null)}>
-                    <X className="w-4 h-4" />
+                  <Button variant="ghost" size="icon" className="h-5 w-5 text-gray-500 hover:text-red-600 shrink-0" onClick={() => setPostCitado(null)}>
+                    <X className="w-3.5 h-3.5" />
                   </Button>
                 </div>
               )}
@@ -269,7 +261,7 @@ export default function ForoDetalle() {
               <textarea
                 ref={textareaRef}
                 placeholder={posts.length === 0 ? "Escribe el post inicial para abrir el debate..." : "Escribe tu respuesta aquí..."}
-                className="w-full min-h-37.5 p-4 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y mb-4"
+                className="w-full min-h-25 max-h-50 p-3 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y mb-3 outline-none"
                 value={nuevoPost}
                 onChange={(e) => setNuevoPost(e.target.value)}
                 disabled={enviando}
@@ -277,8 +269,8 @@ export default function ForoDetalle() {
               />
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={!nuevoPost.trim() || enviando} className="bg-blue-600 hover:bg-blue-700 px-8">
-                  {enviando ? 'Publicando...' : (posts.length === 0 ? 'Publicar Tema' : 'Responder')}
+                <Button type="submit" disabled={!nuevoPost.trim() || enviando} className="bg-blue-600 hover:bg-blue-700 px-6 h-9 text-sm font-medium">
+                  {enviando ? 'Publicando...' : (posts.length === 0 ? 'Publicar Tema' : 'Enviar Respuesta')}
                 </Button>
               </div>
             </form>
