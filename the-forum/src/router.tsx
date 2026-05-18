@@ -9,6 +9,7 @@ import JuegoForos from './pages/JuegoForos'
 import ForoDetalle from './pages/ForoDetalle'
 import Register from './pages/Register'
 import AdminUsuarios from './pages/AdminUsuarios'
+import Perfil from './pages/Perfil'
 
 export const router = createBrowserRouter([
   // RUTAS PÚBLICAS
@@ -54,6 +55,9 @@ export const router = createBrowserRouter([
             path: 'usuarios',
             element: <AdminUsuarios />,
           },
+          {path: 'perfil',
+            element: <Perfil />
+          }
         ]
       }
     ]
