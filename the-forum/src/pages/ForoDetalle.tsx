@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, MessageSquareReply, Quote, X, Lock, Unlock, AlertTriangle } from 'lucide-react'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog' // Importación necesaria
 
 export default function ForoDetalle() {
   const { foroId } = useParams<{ foroId: string }>()
@@ -13,6 +14,9 @@ export default function ForoDetalle() {
   const [foro, setForo] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
   const [rolUsuario, setRolUsuario] = useState<number>(3)
+
+  // ESTADO PARA EL DIÁLOGO
+  const [dialogoCierre, setDialogoCierre] = useState(false)
 
   const [nuevoPost, setNuevoPost] = useState('')
   const [postCitado, setPostCitado] = useState<any | null>(null)
@@ -54,8 +58,8 @@ export default function ForoDetalle() {
     cargarDatos()
   }, [foroId, user])
 
-  const toggleCerrarForo = async () => {
-    if (!window.confirm(`¿Seguro que quieres ${foro.cerrado ? 'reabrir' : 'cerrar'} este foro?`)) return
+  // LÓGICA DEL DIÁLOGO EN LUGAR DEL WINDOW.CONFIRM
+  const handleToggleCerrarForo = async () => {
     try {
       const { error } = await supabase.from('foros').update({ cerrado: !foro.cerrado }).eq('id', foroId)
       if (error) throw error
@@ -63,6 +67,7 @@ export default function ForoDetalle() {
     } catch (error) {
       alert("Error al cambiar el estado del foro")
     }
+    setDialogoCierre(false)
   }
 
   const handleEnviarPost = async (e: React.FormEvent) => {
@@ -139,7 +144,7 @@ export default function ForoDetalle() {
           </div>
           
           {(rolUsuario === 1 || rolUsuario === 2) && (
-            <Button variant={foro.cerrado ? "outline" : "destructive"} onClick={toggleCerrarForo} className={`w-full md:w-auto shrink-0 ${foro.cerrado ? 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800 hover:text-white' : ''}`}>
+            <Button variant={foro.cerrado ? "outline" : "destructive"} onClick={() => setDialogoCierre(true)} className={`w-full md:w-auto shrink-0 ${foro.cerrado ? 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800 hover:text-white' : ''}`}>
               {foro.cerrado ? <><Unlock className="w-4 h-4 mr-2" /> Reabrir Tema</> : <><Lock className="w-4 h-4 mr-2" /> Cerrar Tema</>}
             </Button>
           )}
@@ -184,12 +189,7 @@ export default function ForoDetalle() {
               </div>
             )}
           </div>
-        ) : (
-          <div className="bg-slate-900 p-12 text-center rounded-xl border border-dashed border-slate-700">
-            <h3 className="text-lg font-bold text-slate-300">Aún no hay post inicial</h3>
-            <p className="text-slate-500 mt-2">Este foro está vacío. Sé el primero en abrir el debate.</p>
-          </div>
-        )}
+        ) : null}
 
         {/* LISTA DE RESPUESTAS */}
         <div className="space-y-4">
@@ -199,9 +199,7 @@ export default function ForoDetalle() {
             return (
               <div key={post.id} className="bg-slate-900 border border-slate-800 rounded-lg shadow-sm flex flex-col md:flex-row animate-in fade-in slide-in-from-bottom-2">
                 
-                {/* INFO DEL USUARIO EN LA RESPUESTA */}
                 <div className="bg-slate-950/40 border-b md:border-b-0 md:border-r border-slate-800 p-4 md:w-48 shrink-0 flex flex-row md:flex-col items-center md:items-start gap-3">
-                  
                   <div className="w-10 h-10 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-slate-400 font-bold overflow-hidden shrink-0">
                     {post.usuarios?.avatar_url ? (
                       <img src={post.usuarios.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
@@ -209,7 +207,6 @@ export default function ForoDetalle() {
                       post.usuarios?.username?.charAt(0).toUpperCase() || 'U'
                     )}
                   </div>
-
                   <div className="flex-1 text-left flex flex-col md:flex-col gap-1 md:gap-1.5">
                     <div className="font-extrabold text-slate-200 text-sm truncate">
                       {post.usuarios?.username || 'Anónimo'}
@@ -222,7 +219,6 @@ export default function ForoDetalle() {
                 </div>
 
                 <div className="p-4 md:p-5 flex-1 flex flex-col">
-                  {/* CAJA DE CITA */}
                   {postCitadoObj && (
                     <div className="bg-slate-950/60 border-l-4 border-violet-500 p-3 mb-4 rounded-r-md text-sm text-slate-300 relative border-y border-r">
                       <Quote className="w-5 h-5 text-violet-500/20 absolute top-2 right-2" />
@@ -232,13 +228,11 @@ export default function ForoDetalle() {
                       <p className="italic text-slate-400 line-clamp-3 wrap-break-word">{postCitadoObj.contenido}</p>
                     </div>
                   )}
-
                   <div className="flex-1">
                     <p className="whitespace-pre-wrap text-slate-200 leading-relaxed text-sm md:text-[15px] wrap-break-word">
                       {post.contenido}
                     </p>
                   </div>
-
                   {!foro.cerrado && (
                     <div className="mt-4 pt-3 border-t border-slate-800/50 flex justify-end">
                       <Button variant="ghost" size="sm" className="text-slate-500 hover:text-violet-400 hover:bg-slate-800 h-8 text-xs" onClick={() => toggleCitaMode(post)}>
@@ -252,29 +246,21 @@ export default function ForoDetalle() {
           })}
         </div>
 
-        {/* CAJA DE RESPUESTA  */}
+        {/* CAJA DE RESPUESTA */}
         {foro.cerrado ? (
           <div className="sticky bottom-4 z-20 mt-8 bg-red-950/40 border border-red-900/50 rounded-xl p-6 flex flex-col items-center text-center text-red-400 shadow-xl backdrop-blur-sm animate-in slide-in-from-bottom-4">
             <AlertTriangle className="w-10 h-10 mb-2 opacity-80 text-red-500" />
             <h3 className="font-bold text-lg text-red-300">Este tema ha sido cerrado</h3>
-            <p className="text-sm opacity-90 max-w-lg mt-1 text-red-400/80">
-              No se admiten nuevas respuestas, pero puedes seguir leyendo el historial.
-            </p>
           </div>
         ) : (
           <div className="sticky bottom-4 z-20 mt-8 bg-slate-900 border border-slate-700 rounded-xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] overflow-hidden border-t-2 border-t-violet-500 animate-in slide-in-from-bottom-4 backdrop-blur-sm">
             <div className="bg-slate-950 text-slate-300 px-4 py-2.5 font-bold text-xs uppercase tracking-wider flex justify-between items-center border-b border-slate-800">
               <span>Añadir una respuesta</span>
-              {postCitado && <span className="text-[10px] bg-violet-600 px-2 py-0.5 rounded text-white animate-pulse">Modo Cita Activo</span>}
             </div>
-
             <form onSubmit={handleEnviarPost} className="p-4 bg-slate-900">
               {postCitado && (
                 <div className="bg-slate-950 border border-slate-700 p-2.5 mb-3 rounded-md flex justify-between items-start gap-4 transition-all duration-300">
                   <div className="min-w-0 flex-1">
-                    <div className="text-[11px] font-bold text-violet-400 mb-1 flex items-center uppercase tracking-wider">
-                      <Quote className="w-3 h-3 mr-1" /> Cita seleccionada:
-                    </div>
                     <p className="text-xs text-slate-400 italic truncate wrap-break-word">{postCitado.contenido}</p>
                   </div>
                   <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-500 hover:text-red-400 hover:bg-slate-800 shrink-0 rounded-full" onClick={() => setPostCitado(null)}>
@@ -282,26 +268,30 @@ export default function ForoDetalle() {
                   </Button>
                 </div>
               )}
-
               <textarea
                 ref={textareaRef}
-                placeholder={posts.length === 0 ? "Escribe el post inicial para abrir el debate..." : "Escribe tu respuesta aquí..."}
                 className="w-full min-h-25 max-h-50 p-3 text-sm bg-slate-950 border border-slate-700 rounded-md focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-y mb-3 outline-none text-white placeholder:text-slate-500 transition-shadow duration-300"
                 value={nuevoPost}
                 onChange={(e) => setNuevoPost(e.target.value)}
                 disabled={enviando}
                 required
               />
-
-              <div className="flex justify-end gap-2">
-                <Button type="submit" disabled={!nuevoPost.trim() || enviando} className="bg-violet-600 hover:bg-violet-700 text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] px-6 h-10 text-sm font-bold flex-1 sm:flex-none">
-                  {enviando ? 'Publicando...' : (posts.length === 0 ? 'Publicar Tema' : 'Enviar Respuesta')}
+              <div className="flex justify-end">
+                <Button type="submit" disabled={!nuevoPost.trim() || enviando} className="bg-violet-600 hover:bg-violet-700 text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] px-6 h-10 text-sm font-bold">
+                  {enviando ? 'Publicando...' : 'Enviar Respuesta'}
                 </Button>
               </div>
             </form>
           </div>
         )}
 
+        <ConfirmDialog 
+          open={dialogoCierre}
+          onOpenChange={setDialogoCierre}
+          title={`${foro?.cerrado ? 'Reabrir' : 'Cerrar'} hilo`}
+          description={`¿Seguro que quieres ${foro?.cerrado ? 'reabrir' : 'cerrar'} el hilo "${foro?.titulo}"?`}
+          onConfirm={handleToggleCerrarForo}
+        />
       </div>
     </div>
   )
