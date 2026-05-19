@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, MessageSquareReply, Quote, X, Lock, Unlock, AlertTriangle } from 'lucide-react'
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog' // Importación necesaria
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog' 
 
 export default function ForoDetalle() {
   const { foroId } = useParams<{ foroId: string }>()
