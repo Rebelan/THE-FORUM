@@ -7,6 +7,10 @@ import Main from '@/pages/Main'
 import Foros from './pages/Foros'
 import JuegoForos from './pages/JuegoForos'
 import ForoDetalle from './pages/ForoDetalle'
+import Register from './pages/Register'
+import AdminUsuarios from './pages/AdminUsuarios'
+import Perfil from './pages/Perfil'
+import Notificaciones from './pages/Notificaciones'
 
 export const router = createBrowserRouter([
   // RUTAS PÚBLICAS
@@ -18,19 +22,23 @@ export const router = createBrowserRouter([
     path: '/login',
     element: <Login />,
   },
-  
+  {
+    path: '/register',
+    element: <Register />
+  },
+
   // RUTAS PRIVADAS (Protegidas)
   {
     path: '/app',
     element: <AuthGuard />,
     children: [
       {
-        path: '', 
+        path: '',
         element: <MainLayout />,
         children: [
           {
             path: '',
-            element: <Main />, 
+            element: <Main />,
           },
           {
             path: 'foros',
@@ -38,11 +46,23 @@ export const router = createBrowserRouter([
           },
           {
             path: 'foros/juego/:id',
-            element: <JuegoForos />, 
+            element: <JuegoForos />,
           },
           {
             path: 'foro/:foroId',
-            element: <ForoDetalle />, 
+            element: <ForoDetalle />,
+          },
+          {
+            path: 'usuarios',
+            element: <AdminUsuarios />,
+          },
+          {
+            path: 'perfil',
+            element: <Perfil />
+          },
+          {
+            path: 'notificaciones',
+            element: <Notificaciones />
           },
         ]
       }
