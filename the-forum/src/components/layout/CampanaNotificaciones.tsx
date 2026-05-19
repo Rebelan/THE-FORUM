@@ -7,7 +7,7 @@ import { Bell, MessageSquare, Quote, CheckCheck } from 'lucide-react'
 export function CampanaNotificaciones() {
   const user = useAuthStore((state) => state.user)
   const navigate = useNavigate()
-  
+
   const [notificaciones, setNotificaciones] = useState<any[]>([])
   const [noLeidas, setNoLeidas] = useState(0)
   const [abierto, setAbierto] = useState(false)
@@ -21,7 +21,7 @@ export function CampanaNotificaciones() {
       .eq('usuario_id', user.id)
       .order('created_at', { ascending: false })
       .limit(5)
-    
+
     if (data) {
       setNotificaciones(data)
       setNoLeidas(data.filter(n => !n.leida).length)
@@ -49,7 +49,7 @@ export function CampanaNotificaciones() {
   return (
     <div className="relative" ref={menuRef}>
       {/* ICONO DE CAMPANA */}
-      <button 
+      <button
         onClick={() => setAbierto(!abierto)}
         className="relative p-2.5 text-slate-400 hover:text-violet-400 hover:bg-slate-900 rounded-full transition-colors focus:outline-none"
       >
@@ -63,12 +63,11 @@ export function CampanaNotificaciones() {
 
       {/* MENÚ DESPLEGABLE */}
       {abierto && (
-        <div className="absolute right-0 mt-2 w-80 bg-slate-950 rounded-xl shadow-2xl shadow-black/50 border border-slate-800 z-50 overflow-hidden animate-in slide-in-from-top-2">
-          
+        <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-75 sm:w-80 max-w-[90vw] bg-slate-950 rounded-xl shadow-2xl shadow-black/50 border border-slate-800 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
           <div className="p-3 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
             <span className="font-bold text-sm text-slate-100">Notificaciones</span>
             {noLeidas > 0 && (
-              <button 
+              <button
                 onClick={async () => {
                   await supabase.from('notificaciones').update({ leida: true }).eq('usuario_id', user?.id)
                   cargarNotificaciones()
@@ -86,8 +85,8 @@ export function CampanaNotificaciones() {
             ) : (
               <div className="divide-y divide-slate-800">
                 {notificaciones.map((notif) => (
-                  <div 
-                    key={notif.id} 
+                  <div
+                    key={notif.id}
                     onClick={() => marcarComoLeida(notif.id, notif.foro_id)}
                     className={`p-4 cursor-pointer transition-colors hover:bg-slate-900 flex gap-3 items-start ${notif.leida ? 'opacity-50 bg-slate-950' : 'bg-violet-900/10'}`}
                   >
@@ -97,7 +96,7 @@ export function CampanaNotificaciones() {
                     <div>
                       <p className="text-sm text-slate-300 line-clamp-2">
                         <span className="font-bold text-slate-100">{notif.actor?.username}</span>{' '}
-                        {notif.tipo === 'cita' ? 'citó tu mensaje en' : 'respondió a tu tema'} <br/>
+                        {notif.tipo === 'cita' ? 'citó tu mensaje en' : 'respondió a tu tema'} <br />
                         <span className="font-semibold text-violet-300">"{notif.foros?.titulo}"</span>
                       </p>
                       <p className="text-xs text-slate-500 mt-1 font-medium">
@@ -112,7 +111,7 @@ export function CampanaNotificaciones() {
           </div>
 
           <div className="p-2 bg-slate-900 border-t border-slate-800 text-center">
-            <button 
+            <button
               onClick={() => { setAbierto(false); navigate('/app/notificaciones'); }}
               className="text-sm font-bold text-violet-400 hover:text-violet-300 transition-colors"
             >
