@@ -58,7 +58,6 @@ export default function ForoDetalle() {
     cargarDatos()
   }, [foroId, user])
 
-  // LÓGICA DEL DIÁLOGO EN LUGAR DEL WINDOW.CONFIRM
   const handleToggleCerrarForo = async () => {
     try {
       const { error } = await supabase.from('foros').update({ cerrado: !foro.cerrado }).eq('id', foroId)
