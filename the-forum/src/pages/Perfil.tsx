@@ -82,7 +82,6 @@ export default function Perfil() {
       
       await cargarPerfil()
       
-
       window.dispatchEvent(new Event('perfilActualizado'))
 
     } catch (error: any) {
@@ -93,119 +92,159 @@ export default function Perfil() {
     }
   }
 
-  if (cargando) return <div className="p-8 text-center text-gray-500 animate-pulse">Cargando perfil...</div>
-  if (!perfil) return <div className="p-8 text-center text-red-500">No se pudo cargar el perfil.</div>
+  if (cargando) return <div className="p-8 pt-24 text-center text-slate-500 font-medium animate-pulse min-h-screen bg-background">Cargando perfil...</div>
+  if (!perfil) return <div className="p-8 pt-24 text-center text-red-500 font-bold min-h-screen bg-background">No se pudo cargar el perfil.</div>
 
   return (
-    <div className="max-w-5xl mx-auto p-8 animate-in fade-in">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-900">Mi Perfil</h1>
-        {!modoEdicion && (
-          <Button onClick={() => setModoEdicion(true)} variant="outline" size="sm">
-            <Edit2 className="w-4 h-4 mr-2" /> Editar Perfil
-          </Button>
-        )}
-      </div>
-
-      <form onSubmit={handleGuardarPerfil} className="flex flex-col md:flex-row gap-8">
+    <div className="min-h-screen bg-background text-foreground pb-12 overflow-x-hidden">
+      <div className="max-w-5xl mx-auto p-4 md:p-8 pt-20 md:pt-8 animate-in fade-in duration-500">
         
-        {/* COLUMNA IZQUIERDA */}
-        <div className="w-full md:w-1/3 bg-white border border-gray-200 rounded-xl shadow-sm p-6 flex flex-col items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight drop-shadow-sm">Mi Perfil</h1>
+          {!modoEdicion && (
+            <Button 
+              onClick={() => setModoEdicion(true)} 
+              variant="outline" 
+              className="w-full sm:w-auto bg-slate-900 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white"
+            >
+              <Edit2 className="w-4 h-4 mr-2" /> Editar Perfil
+            </Button>
+          )}
+        </div>
+
+        <form onSubmit={handleGuardarPerfil} className="flex flex-col md:flex-row gap-6 md:gap-8">
           
-          <div className="relative group mb-6">
-            <div className="w-40 h-40 rounded-full border-4 border-gray-50 shadow-md bg-blue-100 flex items-center justify-center overflow-hidden">
-              {vistaPreviaFoto ? (
-                <img src={vistaPreviaFoto} alt="Previa" className="w-full h-full object-cover" />
-              ) : perfil.avatar_url ? (
-                <img src={perfil.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+          <div className="w-full md:w-1/3 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-6 flex flex-col items-center relative overflow-hidden">
+            
+            <div className="absolute top-0 left-0 w-full h-32 bg-linear-to-b from-violet-900/20 to-transparent pointer-events-none"></div>
+
+            <div className="relative group mb-6 mt-4">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-slate-800 shadow-[0_0_20px_rgba(139,92,246,0.15)] bg-slate-800 flex items-center justify-center overflow-hidden transition-transform duration-300 group-hover:scale-105">
+                {vistaPreviaFoto ? (
+                  <img src={vistaPreviaFoto} alt="Previa" className="w-full h-full object-cover" />
+                ) : perfil.avatar_url ? (
+                  <img src={perfil.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-5xl md:text-6xl font-black text-violet-400 drop-shadow-md">
+                    {perfil.username?.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+
+              {modoEdicion && (
+                <label className="absolute inset-0 bg-black/60 rounded-full flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm border-4 border-violet-500/50">
+                  <Camera className="w-6 h-6 mb-1" />
+                  Cambiar Foto
+                  <input type="file" accept="image/*" className="hidden" onChange={handleCambiarFotoLocal} />
+                </label>
+              )}
+            </div>
+
+            {modoEdicion ? (
+              <div className="w-full space-y-1 mb-2">
+                <label className="text-[11px] font-black text-violet-400 uppercase tracking-wider">Nombre de usuario</label>
+                <Input 
+                  value={usernameEdit} 
+                  onChange={(e) => setUsernameEdit(e.target.value)} 
+                  required 
+                  maxLength={25} 
+                  className="bg-slate-950 border-slate-700 text-white font-bold text-center focus-visible:ring-violet-500"
+                />
+              </div>
+            ) : (
+              <h2 className="text-2xl md:text-3xl font-black text-white text-center w-full truncate mb-2 drop-shadow-sm">
+                {perfil.username}
+              </h2>
+            )}
+
+            <div className="w-full mt-6 space-y-4 border-t border-slate-800/80 pt-6 relative z-10">
+              <div className="flex items-center gap-4 p-3 bg-slate-950/50 rounded-xl border border-slate-800/50">
+                <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div className="overflow-hidden">
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-0.5">Correo</p>
+                  <p className="text-sm font-medium text-slate-200 truncate">{user?.email}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 p-3 bg-slate-950/50 rounded-xl border border-slate-800/50">
+                <div className={`w-10 h-10 rounded-full border flex items-center justify-center shrink-0 ${
+                  perfil.rol_id === 1 ? 'bg-red-900/20 border-red-500/30 text-red-400' : 
+                  perfil.rol_id === 2 ? 'bg-amber-900/20 border-amber-500/30 text-amber-400' : 
+                  'bg-violet-900/20 border-violet-500/30 text-violet-400'
+                }`}>
+                  {perfil.rol_id === 1 ? <ShieldAlert className="w-4 h-4" /> : 
+                   perfil.rol_id === 2 ? <Shield className="w-4 h-4" /> : 
+                   <UserIcon className="w-4 h-4" />}
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-0.5">Rango</p>
+                  <p className="text-sm font-bold text-slate-200">
+                    {perfil.rol_id === 1 ? 'Administrador' : perfil.rol_id === 2 ? 'Moderador' : 'Usuario'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full md:w-2/3 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-6 md:p-8 flex flex-col">
+            <h3 className="text-xl font-bold text-white border-b border-slate-800 pb-4 mb-6 flex items-center gap-2">
+              <UserIcon className="w-5 h-5 text-violet-400" /> Sobre Mí
+            </h3>
+            
+            <div className="flex-1 flex flex-col">
+              {modoEdicion ? (
+                <div className="flex-1 flex flex-col h-full min-h-62.5">
+                  <textarea
+                    value={biografiaEdit}
+                    onChange={(e) => setBiografiaEdit(e.target.value)}
+                    placeholder="Cuéntale a la comunidad qué te gusta jugar, tus logros, o tus sagas favoritas..."
+                    className="w-full flex-1 p-4 text-base bg-slate-950 border border-slate-700 text-slate-200 placeholder:text-slate-600 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none transition-shadow"
+                    maxLength={500}
+                  />
+                  <div className="text-right text-xs font-medium text-slate-500 mt-2">
+                    {biografiaEdit.length} / 500
+                  </div>
+                </div>
+              ) : perfil.biografia ? (
+                <p className="text-slate-300 whitespace-pre-wrap leading-relaxed text-base md:text-lg p-2">
+                  {perfil.biografia}
+                </p>
               ) : (
-                <span className="text-6xl font-black text-blue-300">{perfil.username?.charAt(0).toUpperCase()}</span>
+                <div className="h-full flex flex-col items-center justify-center text-slate-500 py-16 text-center space-y-4 bg-slate-950/30 rounded-xl border border-dashed border-slate-800">
+                  <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center">
+                    <UserIcon className="w-8 h-8 text-slate-600" />
+                  </div>
+                  <p className="font-medium text-slate-400">Aún no has escrito nada sobre ti.</p>
+                </div>
               )}
             </div>
 
             {modoEdicion && (
-              <label className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center text-white text-xs font-bold cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera className="w-6 h-6 mb-1" />
-                Cambiar Foto
-                <input type="file" accept="image/*" className="hidden" onChange={handleCambiarFotoLocal} />
-              </label>
-            )}
-          </div>
-
-          {modoEdicion ? (
-            <div className="w-full space-y-1 mb-2">
-              <label className="text-xs font-bold text-gray-500 uppercase">Nombre de usuario</label>
-              <Input value={usernameEdit} onChange={(e) => setUsernameEdit(e.target.value)} required maxLength={25} />
-            </div>
-          ) : (
-            <h2 className="text-2xl font-bold text-gray-900 text-center w-full truncate mb-2">
-              {perfil.username}
-            </h2>
-          )}
-
-          <div className="w-full mt-4 space-y-4 border-t border-gray-100 pt-4">
-            <div className="flex items-center gap-3 text-sm">
-              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
-                <Mail className="w-4 h-4" />
-              </div>
-              <div className="overflow-hidden">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Correo</p>
-                <p className="text-gray-900 truncate">{user?.email}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 text-sm">
-              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
-                {perfil.rol_id === 1 ? <ShieldAlert className="w-4 h-4 text-red-600" /> : 
-                 perfil.rol_id === 2 ? <Shield className="w-4 h-4 text-amber-600" /> : 
-                 <UserIcon className="w-4 h-4 text-blue-600" />}
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Rango</p>
-                <p className="font-medium text-gray-900">
-                  {perfil.rol_id === 1 ? 'Administrador' : perfil.rol_id === 2 ? 'Moderador' : 'Usuario'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* COLUMNA DERECHA */}
-        <div className="w-full md:w-2/3 bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-8 flex flex-col">
-          <h3 className="text-xl font-bold text-gray-900 border-b border-gray-100 pb-4 mb-4">Sobre Mí</h3>
-          
-          <div className="flex-1 flex flex-col">
-            {modoEdicion ? (
-              <textarea
-                value={biografiaEdit}
-                onChange={(e) => setBiografiaEdit(e.target.value)}
-                placeholder="Cuéntale a la comunidad qué te gusta jugar..."
-                className="w-full flex-1 min-h-50 p-4 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
-                maxLength={500}
-              />
-            ) : perfil.biografia ? (
-              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{perfil.biografia}</p>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400 py-12 text-center space-y-3">
-                <UserIcon className="w-12 h-12 opacity-20" />
-                <p>Aún no has escrito nada sobre ti.</p>
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-6 border-t border-slate-800">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => { setModoEdicion(false); setVistaPreviaFoto(null); setNuevaFoto(null); }} 
+                  disabled={guardando}
+                  className="w-full sm:w-auto text-slate-400 hover:text-white hover:bg-slate-800"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={guardando} 
+                  className="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+                >
+                  {guardando ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Guardando...</> : 'Guardar Cambios'}
+                </Button>
               </div>
             )}
           </div>
 
-          {modoEdicion && (
-            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-              <Button type="button" variant="ghost" onClick={() => { setModoEdicion(false); setVistaPreviaFoto(null); setNuevaFoto(null); }} disabled={guardando}>
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={guardando} className="bg-blue-600 hover:bg-blue-700">
-                {guardando ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Guardando...</> : 'Guardar Cambios'}
-              </Button>
-            </div>
-          )}
-        </div>
-
-      </form>
+        </form>
+      </div>
     </div>
   )
 }
