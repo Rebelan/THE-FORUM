@@ -39,14 +39,14 @@ export default function Foros() {
   }, [busqueda])
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 bg-background text-foreground min-h-screen">
+    <div className="p-4 md:p-8 pt-20 md:pt-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 bg-background min-h-screen text-foreground overflow-x-hidden">
       
       {/* CABECERA Y BUSCADOR */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-800">
         <div>
-          <h1 className="text-4xl font-extrabold text-white tracking-tight">Directorio de Juegos</h1>
-          <p className="text-slate-400 mt-2 text-md font-medium">
-            Selecciona un videojuego para ver sus foros o crea uno nuevo.
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Directorio de Juegos</h1>
+          <p className="text-slate-400 mt-2 text-sm md:text-md font-medium">
+            Selecciona un videojuego para ver sus foros.
           </p>
         </div>
 
@@ -71,11 +71,11 @@ export default function Foros() {
           No se han encontrado juegos con ese nombre.
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {juegos.map((juego) => (
             <div 
               key={juego.id} 
-              className="group relative h-52 rounded-2xl overflow-hidden cursor-pointer border-2 border-slate-800 hover:border-violet-500 hover:shadow-[0_0_25px_rgba(139,92,246,0.35)] transition-all duration-300"
+              className="group relative h-48 md:h-52 rounded-2xl overflow-hidden cursor-pointer border-2 border-slate-800 hover:border-violet-500 hover:shadow-[0_0_25px_rgba(139,92,246,0.35)] transition-all duration-300"
               onClick={() => navigate(`/app/foros/juego/${juego.id}`)}
             >
               {juego.background_image ? (
