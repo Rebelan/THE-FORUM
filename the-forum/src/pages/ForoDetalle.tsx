@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, MessageSquareReply, Quote, X, Lock, Unlock, AlertTriangle } from 'lucide-react'
-import { ConfirmDialog } from '@/components/ui/ConfirmDialog' 
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 export default function ForoDetalle() {
   const { foroId } = useParams<{ foroId: string }>()
@@ -141,7 +141,7 @@ export default function ForoDetalle() {
               </div>
             </div>
           </div>
-          
+
           {(rolUsuario === 1 || rolUsuario === 2) && (
             <Button variant={foro.cerrado ? "outline" : "destructive"} onClick={() => setDialogoCierre(true)} className={`w-full md:w-auto shrink-0 ${foro.cerrado ? 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800 hover:text-white' : ''}`}>
               {foro.cerrado ? <><Unlock className="w-4 h-4 mr-2" /> Reabrir Tema</> : <><Lock className="w-4 h-4 mr-2" /> Cerrar Tema</>}
@@ -155,6 +155,7 @@ export default function ForoDetalle() {
 
         {/* POST INICIAL */}
         {postInicial ? (
+
           <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-md overflow-hidden animate-in fade-in slide-in-from-bottom-2">
             <div className="bg-slate-950/50 border-b border-slate-800 p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm gap-3 sm:gap-0">
               <div className="flex items-center gap-3">
@@ -179,16 +180,28 @@ export default function ForoDetalle() {
                 {postInicial.contenido}
               </p>
             </div>
-
             {!foro.cerrado && (
+
               <div className="bg-slate-950/30 p-3 border-t border-slate-800 flex justify-end">
                 <Button variant="ghost" size="sm" className="text-slate-400 hover:text-violet-400 hover:bg-slate-900 h-9" onClick={() => toggleCitaMode(postInicial)}>
                   <MessageSquareReply className="w-4 h-4 mr-2" /> Responder al tema
                 </Button>
               </div>
+
             )}
           </div>
-        ) : null}
+
+        ) : (
+
+          <div className="bg-slate-900 p-12 text-center rounded-xl border border-dashed border-slate-700">
+
+            <h3 className="text-lg font-bold text-slate-300">Aún no hay post inicial</h3>
+
+            <p className="text-slate-500 mt-2">Este foro está vacío. Sé el primero en abrir el debate.</p>
+
+          </div>
+
+        )}
 
         {/* LISTA DE RESPUESTAS */}
         <div className="space-y-4">
@@ -197,7 +210,7 @@ export default function ForoDetalle() {
 
             return (
               <div key={post.id} className="bg-slate-900 border border-slate-800 rounded-lg shadow-sm flex flex-col md:flex-row animate-in fade-in slide-in-from-bottom-2">
-                
+
                 <div className="bg-slate-950/40 border-b md:border-b-0 md:border-r border-slate-800 p-4 md:w-48 shrink-0 flex flex-row md:flex-col items-center md:items-start gap-3">
                   <div className="w-10 h-10 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-slate-400 font-bold overflow-hidden shrink-0">
                     {post.usuarios?.avatar_url ? (
@@ -284,7 +297,7 @@ export default function ForoDetalle() {
           </div>
         )}
 
-        <ConfirmDialog 
+        <ConfirmDialog
           open={dialogoCierre}
           onOpenChange={setDialogoCierre}
           title={`${foro?.cerrado ? 'Reabrir' : 'Cerrar'} hilo`}
