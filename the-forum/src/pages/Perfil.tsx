@@ -18,6 +18,9 @@ export default function Perfil() {
   const [nuevaFoto, setNuevaFoto] = useState<File | null>(null)
   const [vistaPreviaFoto, setVistaPreviaFoto] = useState<string | null>(null)
   const [guardando, setGuardando] = useState(false)
+  
+
+  const [errorMensaje, setErrorMensaje] = useState<string | null>(null)
 
   async function cargarPerfil() {
     if (!user) return
@@ -40,6 +43,7 @@ export default function Perfil() {
       const archivo = e.target.files[0]
       setNuevaFoto(archivo)
       setVistaPreviaFoto(URL.createObjectURL(archivo))
+      setErrorMensaje(null)
     }
   }
 
@@ -48,6 +52,8 @@ export default function Perfil() {
     if (!user || !usernameEdit.trim()) return
 
     setGuardando(true)
+    setErrorMensaje(null)
+
     try {
       let urlFinalAvatar = perfil.avatar_url
 
@@ -86,7 +92,7 @@ export default function Perfil() {
 
     } catch (error: any) {
       console.error(error)
-      alert("Error al actualizar el perfil: " + error.message)
+      setErrorMensaje(error.message || "Error al actualizar el perfil. Inténtalo de nuevo.")
     } finally {
       setGuardando(false)
     }
@@ -145,7 +151,10 @@ export default function Perfil() {
                 <label className="text-[11px] font-black text-violet-400 uppercase tracking-wider">Nombre de usuario</label>
                 <Input 
                   value={usernameEdit} 
-                  onChange={(e) => setUsernameEdit(e.target.value)} 
+                  onChange={(e) => {
+                    setUsernameEdit(e.target.value)
+                    setErrorMensaje(null)
+                  }} 
                   required 
                   maxLength={25} 
                   className="bg-slate-950 border-slate-700 text-white font-bold text-center focus-visible:ring-violet-500"
@@ -198,7 +207,10 @@ export default function Perfil() {
                 <div className="flex-1 flex flex-col h-full min-h-62.5">
                   <textarea
                     value={biografiaEdit}
-                    onChange={(e) => setBiografiaEdit(e.target.value)}
+                    onChange={(e) => {
+                      setBiografiaEdit(e.target.value)
+                      setErrorMensaje(null)
+                    }}
                     placeholder="Cuéntale a la comunidad qué te gusta jugar, tus logros, o tus sagas favoritas..."
                     className="w-full flex-1 p-4 text-base bg-slate-950 border border-slate-700 text-slate-200 placeholder:text-slate-600 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none transition-shadow"
                     maxLength={500}
@@ -221,12 +233,24 @@ export default function Perfil() {
               )}
             </div>
 
+            {errorMensaje && (
+              <div className="mt-6 p-3 bg-red-950/50 border border-red-900 rounded-lg flex items-start gap-3 text-red-400 text-sm animate-in fade-in">
+                <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
+                <span>{errorMensaje}</span>
+              </div>
+            )}
+
             {modoEdicion && (
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-6 border-t border-slate-800">
                 <Button 
                   type="button" 
                   variant="ghost" 
-                  onClick={() => { setModoEdicion(false); setVistaPreviaFoto(null); setNuevaFoto(null); }} 
+                  onClick={() => { 
+                    setModoEdicion(false); 
+                    setVistaPreviaFoto(null); 
+                    setNuevaFoto(null); 
+                    setErrorMensaje(null);
+                  }} 
                   disabled={guardando}
                   className="w-full sm:w-auto text-slate-400 hover:text-white hover:bg-slate-800"
                 >
