@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom' // <--- 1. Importamos useNavigate
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/lib/supabase'
 import { Input } from '@/components/ui/input'
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { 
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger 
 } from '@/components/ui/dialog'
-import { PlusCircle, Search, X } from 'lucide-react'
+import { PlusCircle, Search, X, AlertTriangle } from 'lucide-react' 
 import type { Categoria } from '@/types'
 import { rawgApi, type JuegoBuscador } from '@/lib/rawg'
 
@@ -19,7 +19,7 @@ interface CrearForoModalProps {
 
 export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) {
   const user = useAuthStore((state) => state.user)
-  const navigate = useNavigate() // <--- 2. Instanciamos navigate
+  const navigate = useNavigate()
   
   const [modalAbierto, setModalAbierto] = useState(false)
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -32,6 +32,9 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
   const [tituloForo, setTituloForo] = useState('')
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | ''>('')
   const [creandoForo, setCreandoForo] = useState(false)
+  
+
+  const [errorMensaje, setErrorMensaje] = useState<string | null>(null)
 
   useEffect(() => {
     supabase.from('categorias').select('*').order('nombre').then(({ data }) => {
@@ -64,6 +67,7 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
     if (!juegoSeleccionado || !user || !categoriaSeleccionada) return
 
     setCreandoForo(true)
+    setErrorMensaje(null) 
 
     try {
       const { data: juegoExistente } = await supabase.from('videojuegos').select('id').eq('id', juegoSeleccionado.id).single()
@@ -76,7 +80,6 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
         })
       }
 
-
       const { data: nuevoForo, error: errorForo } = await supabase
         .from('foros')
         .insert({
@@ -84,27 +87,31 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
           videojuego_id: juegoSeleccionado.id,
           categoria_id: Number(categoriaSeleccionada),
           creador_id: user.id,
-          cerrado: false 
+          cerrado: false
         })
-        .select() 
+        .select()
         .single()
 
       if (errorForo) throw errorForo
 
+   
       setModalAbierto(false)
       setTituloForo('')
       setCategoriaSeleccionada('')
+      setErrorMensaje(null)
       if (!juegoInicial) setJuegoSeleccionado(null) 
       
       if (onCreado) onCreado()
 
+      
       if (nuevoForo) {
         navigate(`/app/foro/${nuevoForo.id}`)
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al crear el foro:", error)
-      alert("Hubo un error al crear el foro. Revisa la consola.")
+      
+      setErrorMensaje(error.message || "Hubo un problema al crear el foro. Inténtalo de nuevo.")
     } finally {
       setCreandoForo(false)
     }
@@ -117,6 +124,7 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
       setResultadosJuegos([])
       setTituloForo('')
       setCategoriaSeleccionada('')
+      setErrorMensaje(null) 
       if (!juegoInicial) setJuegoSeleccionado(null)
     }
   }
@@ -145,7 +153,10 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
               id="titulo" 
               placeholder="Ej. Dudas de principiantes..." 
               value={tituloForo} 
-              onChange={(e) => setTituloForo(e.target.value)} 
+              onChange={(e) => {
+                setTituloForo(e.target.value)
+                setErrorMensaje(null)
+              }} 
               required 
               className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus-visible:ring-violet-500"
             />
@@ -156,7 +167,10 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
             <select 
               id="categoria" 
               value={categoriaSeleccionada} 
-              onChange={(e) => setCategoriaSeleccionada(e.target.value as unknown as number)} 
+              onChange={(e) => {
+                setCategoriaSeleccionada(e.target.value as unknown as number)
+                setErrorMensaje(null)
+              }} 
               required 
               className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             >
@@ -176,7 +190,10 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
                   <span className="font-bold text-violet-200">{juegoSeleccionado.name}</span>
                 </div>
                 {!juegoInicial && (
-                  <Button variant="ghost" size="icon" onClick={() => setJuegoSeleccionado(null)} type="button" className="text-slate-400 hover:text-red-400 hover:bg-slate-900/50">
+                  <Button variant="ghost" size="icon" onClick={() => {
+                    setJuegoSeleccionado(null)
+                    setErrorMensaje(null)
+                  }} type="button" className="text-slate-400 hover:text-red-400 hover:bg-slate-900/50">
                     <X className="h-4 w-4" />
                   </Button>
                 )}
@@ -203,7 +220,12 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
                       <div 
                         key={juego.id} 
                         className="flex items-center gap-3 p-2 hover:bg-slate-700 cursor-pointer transition-colors" 
-                        onClick={() => { setJuegoSeleccionado(juego); setResultadosJuegos([]); setBusqueda(''); }}
+                        onClick={() => { 
+                          setJuegoSeleccionado(juego); 
+                          setResultadosJuegos([]); 
+                          setBusqueda(''); 
+                          setErrorMensaje(null);
+                        }}
                       >
                         <img src={juego.background_image || 'https://via.placeholder.com/150'} className="w-8 h-8 object-cover rounded"/>
                         <span className="text-sm font-medium text-slate-200">{juego.name}</span>
@@ -214,6 +236,13 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
               </div>
             )}
           </div>
+
+          {errorMensaje && (
+            <div className="p-3 bg-red-950/50 border border-red-900 rounded-lg flex items-start gap-3 text-red-400 text-sm animate-in fade-in">
+              <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
+              <span>{errorMensaje}</span>
+            </div>
+          )}
 
           <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold h-11" disabled={creandoForo || !juegoSeleccionado}>
             {creandoForo ? 'Creando foro...' : 'Confirmar y Crear Foro'}
