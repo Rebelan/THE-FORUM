@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobileOpen, setIsMobileOpen] = useState(false) 
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [perfil, setPerfil] = useState<any>(null)
 
   const user = useAuthStore((state) => state.user)
@@ -72,7 +72,7 @@ export function Sidebar() {
       )}
 
       {/* SIDEBAR PRINCIPAL */}
-      <aside 
+      <aside
         className={`
           fixed inset-y-0 left-0 z-50 bg-slate-950 border-r border-slate-800 transition-all duration-300 flex flex-col h-full
           ${isMobileOpen ? 'translate-x-0 w-72 shadow-2xl' : '-translate-x-full w-72'} 
@@ -82,18 +82,20 @@ export function Sidebar() {
       >
         {/* CABECERA */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800 shrink-0">
-          <span className={`font-black text-xl text-violet-500 tracking-wider group ${isCollapsed ? 'hidden md:hidden' : 'block'}`}>
-            THE <span className='group-hover:text-white transition-colors'>FORUM</span>
-          </span>
+          <Link to='/app'>
+            <span className={`font-black text-xl text-violet-500 tracking-wider group ${isCollapsed ? 'hidden md:hidden' : 'block'}`}>
+              THE <span className='group-hover:text-white transition-colors'>FORUM</span>
+            </span>
+          </Link>
 
           <Button variant="ghost" size="icon" onClick={handleCerrarMovil} className="md:hidden ml-auto text-slate-400 hover:text-white">
             <X className="h-5 w-5" />
           </Button>
 
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setIsCollapsed(!isCollapsed)} 
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsCollapsed(!isCollapsed)}
             className={`hidden md:flex ${isCollapsed ? "mx-auto" : "ml-auto"} text-slate-400 hover:text-white`}
           >
             <Menu className="h-5 w-5" />
@@ -103,8 +105,8 @@ export function Sidebar() {
         {/* SECCIÓN DEL PERFIL */}
         {perfil && (
           <div className="px-3 pt-4 shrink-0 bg-slate-950/50">
-            <Link 
-              to="/app/perfil" 
+            <Link
+              to="/app/perfil"
               onClick={handleCerrarMovil}
               className={`flex items-center gap-3 p-2 rounded-lg hover:bg-slate-900 transition-colors group ${isCollapsed ? 'md:justify-center' : ''}`}
             >
@@ -130,8 +132,8 @@ export function Sidebar() {
             const isActive = location.pathname === item.path
             return (
               <Link key={item.name} to={item.path} onClick={handleCerrarMovil}>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className={`
                     w-full flex items-center mb-1 group rounded-lg h-11
                     ${isCollapsed ? 'md:justify-center' : 'justify-start'}
@@ -149,15 +151,15 @@ export function Sidebar() {
 
         {/* PIE DE SIDEBAR */}
         <div className="p-3 border-t border-slate-800 space-y-2 shrink-0 bg-slate-950/80">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             className={`w-full flex items-center text-slate-300 hover:bg-slate-900 hover:text-white ${isCollapsed ? 'md:justify-center' : 'justify-start'}`}
           >
             <Settings className={`h-5 w-5 text-slate-400 ${!isCollapsed && "md:mr-3"} ${isCollapsed ? '' : 'mr-3'}`} />
             <span className={`${isCollapsed ? 'md:hidden' : 'block'}`}>Ajustes</span>
           </Button>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             className={`w-full flex items-center ${isCollapsed ? 'md:justify-center' : 'justify-start'} h-11`}
             onClick={handleLogout}
           >
