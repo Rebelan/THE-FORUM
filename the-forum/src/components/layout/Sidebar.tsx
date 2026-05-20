@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/lib/supabase'
-import { Menu, MessageSquare, Users, Settings, LogOut, Home as HomeIcon, X } from 'lucide-react'
+import { Menu, MessageSquare, MessageCircle, Users, Settings, LogOut, Home as HomeIcon, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function Sidebar() {
@@ -46,6 +46,7 @@ export function Sidebar() {
   const menuItems = [
     { name: 'Inicio', icon: HomeIcon, path: '/app' },
     { name: 'Foros', icon: MessageSquare, path: '/app/foros' },
+    { name: 'Mis Foros', icon: MessageCircle, path: '/app/mis-foros' },
     ...(perfil?.rol_id === 1 ? [{ name: 'Usuarios', icon: Users, path: '/app/usuarios' }] : []),
   ]
 
