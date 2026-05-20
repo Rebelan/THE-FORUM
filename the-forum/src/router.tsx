@@ -11,6 +11,7 @@ import Register from './pages/Register'
 import AdminUsuarios from './pages/AdminUsuarios'
 import Perfil from './pages/Perfil'
 import Notificaciones from './pages/Notificaciones'
+import ForosUsuario from './pages/ForosUsuario'
 
 export const router = createBrowserRouter([
   // RUTAS PÚBLICAS
@@ -63,6 +64,10 @@ export const router = createBrowserRouter([
           {
             path: 'notificaciones',
             element: <Notificaciones />
+          },
+          {
+            path: 'mis-foros',
+            element: <ForosUsuario />,
           },
         ]
       }
