@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom' // <--- 1. Importamos useNavigate
 import { useAuthStore } from '@/store/authStore'
 import { supabase } from '@/lib/supabase'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,7 @@ interface CrearForoModalProps {
 
 export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) {
   const user = useAuthStore((state) => state.user)
+  const navigate = useNavigate() // <--- 2. Instanciamos navigate
   
   const [modalAbierto, setModalAbierto] = useState(false)
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -74,13 +76,18 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
         })
       }
 
-      const { error: errorForo } = await supabase.from('foros').insert({
-        titulo: tituloForo,
-        videojuego_id: juegoSeleccionado.id,
-        categoria_id: Number(categoriaSeleccionada),
-        creador_id: user.id,
-        esta_abierto: true
-      })
+
+      const { data: nuevoForo, error: errorForo } = await supabase
+        .from('foros')
+        .insert({
+          titulo: tituloForo,
+          videojuego_id: juegoSeleccionado.id,
+          categoria_id: Number(categoriaSeleccionada),
+          creador_id: user.id,
+          cerrado: false 
+        })
+        .select() 
+        .single()
 
       if (errorForo) throw errorForo
 
@@ -91,8 +98,13 @@ export function CrearForoModal({ juegoInicial, onCreado }: CrearForoModalProps) 
       
       if (onCreado) onCreado()
 
+      if (nuevoForo) {
+        navigate(`/app/foro/${nuevoForo.id}`)
+      }
+
     } catch (error) {
-      console.error(error)
+      console.error("Error al crear el foro:", error)
+      alert("Hubo un error al crear el foro. Revisa la consola.")
     } finally {
       setCreandoForo(false)
     }
