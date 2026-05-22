@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, MessageSquareReply, Quote, X, Lock, Unlock, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, MessageSquareReply, Quote, X, Lock, Unlock, AlertTriangle, Trash2 } from 'lucide-react' 
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 export default function ForoDetalle() {
@@ -15,8 +15,9 @@ export default function ForoDetalle() {
   const [posts, setPosts] = useState<any[]>([])
   const [rolUsuario, setRolUsuario] = useState<number>(3)
 
-  // ESTADO PARA EL DIÁLOGO
+  // Estados de diálogos
   const [dialogoCierre, setDialogoCierre] = useState(false)
+  const [dialogoBorrarPost, setDialogoBorrarPost] = useState<{open: boolean, id: string}>({open: false, id: ''}) 
 
   const [nuevoPost, setNuevoPost] = useState('')
   const [postCitado, setPostCitado] = useState<any | null>(null)
@@ -67,6 +68,17 @@ export default function ForoDetalle() {
       alert("Error al cambiar el estado del foro")
     }
     setDialogoCierre(false)
+  }
+
+  const handleBorrarPostConfirm = async () => {
+    try {
+      const { error } = await supabase.from('posts').delete().eq('id', dialogoBorrarPost.id)
+      if (error) throw error
+      await cargarDatos() 
+    } catch (error) {
+      console.error("Error al borrar el post:", error)
+    }
+    setDialogoBorrarPost({open: false, id: ''})
   }
 
   const handleEnviarPost = async (e: React.FormEvent) => {
@@ -141,7 +153,7 @@ export default function ForoDetalle() {
               </div>
             </div>
           </div>
-
+          
           {(rolUsuario === 1 || rolUsuario === 2) && (
             <Button variant={foro.cerrado ? "outline" : "destructive"} onClick={() => setDialogoCierre(true)} className={`w-full md:w-auto shrink-0 ${foro.cerrado ? 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800 hover:text-white' : ''}`}>
               {foro.cerrado ? <><Unlock className="w-4 h-4 mr-2" /> Reabrir Tema</> : <><Lock className="w-4 h-4 mr-2" /> Cerrar Tema</>}
@@ -155,7 +167,6 @@ export default function ForoDetalle() {
 
         {/* POST INICIAL */}
         {postInicial ? (
-
           <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-md overflow-hidden animate-in fade-in slide-in-from-bottom-2">
             <div className="bg-slate-950/50 border-b border-slate-800 p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm gap-3 sm:gap-0">
               <div className="flex items-center gap-3">
@@ -180,17 +191,25 @@ export default function ForoDetalle() {
                 {postInicial.contenido}
               </p>
             </div>
-            {!foro.cerrado && (
 
-              <div className="bg-slate-950/30 p-3 border-t border-slate-800 flex justify-end">
+            <div className="bg-slate-950/30 p-3 border-t border-slate-800 flex justify-end gap-2">
+              {(postInicial.autor_id === user?.id || rolUsuario === 1 || rolUsuario === 2) && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-red-500 hover:text-red-400 hover:bg-red-950/40 h-9" 
+                  onClick={() => setDialogoBorrarPost({open: true, id: postInicial.id})}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" /> Borrar
+                </Button>
+              )}
+              {!foro.cerrado && (
                 <Button variant="ghost" size="sm" className="text-slate-400 hover:text-violet-400 hover:bg-slate-900 h-9" onClick={() => toggleCitaMode(postInicial)}>
                   <MessageSquareReply className="w-4 h-4 mr-2" /> Responder al tema
                 </Button>
-              </div>
-
-            )}
+              )}
+            </div>
           </div>
-
         ) : (
 
           <div className="bg-slate-900 p-12 text-center rounded-xl border border-dashed border-slate-700">
@@ -210,7 +229,7 @@ export default function ForoDetalle() {
 
             return (
               <div key={post.id} className="bg-slate-900 border border-slate-800 rounded-lg shadow-sm flex flex-col md:flex-row animate-in fade-in slide-in-from-bottom-2">
-
+                
                 <div className="bg-slate-950/40 border-b md:border-b-0 md:border-r border-slate-800 p-4 md:w-48 shrink-0 flex flex-row md:flex-col items-center md:items-start gap-3">
                   <div className="w-10 h-10 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-slate-400 font-bold overflow-hidden shrink-0">
                     {post.usuarios?.avatar_url ? (
@@ -245,13 +264,24 @@ export default function ForoDetalle() {
                       {post.contenido}
                     </p>
                   </div>
-                  {!foro.cerrado && (
-                    <div className="mt-4 pt-3 border-t border-slate-800/50 flex justify-end">
+                  
+                  <div className="mt-4 pt-3 border-t border-slate-800/50 flex justify-end gap-2">
+                    {(post.autor_id === user?.id || rolUsuario === 1 || rolUsuario === 2) && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-red-500 hover:text-red-400 hover:bg-red-950/40 h-8 text-xs" 
+                        onClick={() => setDialogoBorrarPost({open: true, id: post.id})}
+                      >
+                        <Trash2 className="w-3 h-3 mr-1.5" /> Borrar
+                      </Button>
+                    )}
+                    {!foro.cerrado && (
                       <Button variant="ghost" size="sm" className="text-slate-500 hover:text-violet-400 hover:bg-slate-800 h-8 text-xs" onClick={() => toggleCitaMode(post)}>
                         <Quote className="w-3 h-3 mr-1.5" /> Citar
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             )
@@ -297,12 +327,21 @@ export default function ForoDetalle() {
           </div>
         )}
 
-        <ConfirmDialog
+        <ConfirmDialog 
           open={dialogoCierre}
           onOpenChange={setDialogoCierre}
           title={`${foro?.cerrado ? 'Reabrir' : 'Cerrar'} hilo`}
           description={`¿Seguro que quieres ${foro?.cerrado ? 'reabrir' : 'cerrar'} el hilo "${foro?.titulo}"?`}
           onConfirm={handleToggleCerrarForo}
+        />
+
+        <ConfirmDialog 
+          open={dialogoBorrarPost.open}
+          onOpenChange={(open) => setDialogoBorrarPost({...dialogoBorrarPost, open})}
+          title="Borrar mensaje"
+          description="¿Estás seguro de que quieres borrar este mensaje? Esta acción no se puede deshacer."
+          onConfirm={handleBorrarPostConfirm}
+          variant="destructive"
         />
       </div>
     </div>
