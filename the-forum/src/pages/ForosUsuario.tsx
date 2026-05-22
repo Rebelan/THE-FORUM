@@ -2,17 +2,24 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
-import { MessageSquare, Lock, Unlock, ArrowRight } from 'lucide-react'
+import { MessageSquare, Lock, Unlock, ArrowRight, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import type { Categoria } from '@/types' 
 
 export default function ForosUsuario() {
   const user = useAuthStore((state) => state.user)
   const navigate = useNavigate()
 
   const [foros, setForos] = useState<any[]>([])
+  const [categorias, setCategorias] = useState<Categoria[]>([])
   const [cargando, setCargando] = useState(true)
   const [rolUsuario, setRolUsuario] = useState<number>(3)
+
+  // ESTADOS PARA LOS FILTROS
+  const [filtroTexto, setFiltroTexto] = useState('')
+  const [filtroCategoria, setFiltroCategoria] = useState<string>('todas')
 
   const [dialogoCierre, setDialogoCierre] = useState<{open: boolean, id: string, titulo: string, cerrar: boolean}>({
     open: false, id: '', titulo: '', cerrar: true
@@ -25,6 +32,8 @@ export default function ForosUsuario() {
       const { data: perfil } = await supabase.from('usuarios').select('rol_id').eq('id', user.id).single()
       if (perfil) setRolUsuario(perfil.rol_id)
 
+      const { data: dataCat } = await supabase.from('categorias').select('*').order('nombre')
+      if (dataCat) setCategorias(dataCat)
 
       const { data } = await supabase
         .from('foros')
@@ -55,6 +64,13 @@ export default function ForosUsuario() {
     cargarMisForos()
   }, [user])
 
+  // LÓGICA DE FILTRADO
+  const forosFiltrados = foros.filter(foro => {
+    const coincideTexto = foro.titulo.toLowerCase().includes(filtroTexto.toLowerCase())
+    const coincideCategoria = filtroCategoria === 'todas' || foro.categoria_id?.toString() === filtroCategoria
+    return coincideTexto && coincideCategoria
+  })
+
   if (cargando) return <div className="p-8 pt-24 text-center text-slate-500 font-medium animate-pulse min-h-screen bg-background">Cargando tus debates...</div>
 
   return (
@@ -72,6 +88,31 @@ export default function ForosUsuario() {
           </div>
         </div>
 
+        {foros.length > 0 && (
+          <div className="flex flex-col md:flex-row gap-4 bg-slate-900 p-5 rounded-2xl shadow-xl border border-slate-800 items-center">
+            <div className="relative flex-1 w-full">
+              <Search className="absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+              <Input
+                placeholder="Buscar en tus foros por título..."
+                className="pl-10 h-11 bg-slate-950 border-slate-800 text-white placeholder:text-slate-500 focus-visible:ring-violet-500"
+                value={filtroTexto}
+                onChange={(e) => setFiltroTexto(e.target.value)}
+              />
+            </div>
+
+            <select
+              className="flex h-11 w-full md:w-64 rounded-md border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+              value={filtroCategoria}
+              onChange={(e) => setFiltroCategoria(e.target.value)}
+            >
+              <option value="todas">Todas las categorías</option>
+              {categorias.map(cat => (
+                <option key={cat.id} value={cat.id} className="bg-slate-900 text-white">{cat.nombre}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* LISTADO DE FOROS */}
         <div>
           {foros.length === 0 ? (
@@ -85,9 +126,20 @@ export default function ForosUsuario() {
                 Ir al Directorio
               </Button>
             </div>
+          ) : forosFiltrados.length === 0 ? (
+            <div className="text-center py-16 bg-slate-900/50 rounded-2xl border border-dashed border-slate-800">
+              <Search className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-slate-300">Sin resultados</h3>
+              <p className="text-slate-500 mt-2 font-medium">
+                Ninguno de tus foros coincide con los filtros actuales.
+              </p>
+              <Button variant="outline" onClick={() => {setFiltroTexto(''); setFiltroCategoria('todas')}} className="mt-4 border-slate-700 text-slate-300 hover:text-white">
+                Limpiar filtros
+              </Button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {foros.map((foro) => (
+              {forosFiltrados.map((foro) => (
                 <div
                   key={foro.id}
                   className={`relative p-5 rounded-2xl border-2 transition-all cursor-pointer group flex flex-col justify-between ${
