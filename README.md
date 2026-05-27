@@ -58,7 +58,7 @@ Para evitar las limitaciones de un catálogo estático, la plataforma se nutre e
 
 ## 👨‍💻 Autor
 
-- **Tu Nombre / Tu Alias** - *Desarrollador Full Stack*
+- **Abel Constantino Muñoz** - *Desarrollador Full Stack*
 - GitHub: [@Rebelan](https://github.com/Rebelan)
 
 ---
